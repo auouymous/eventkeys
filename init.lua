@@ -537,14 +537,16 @@ minetest.register_node("eventkeys:prize_node", {
 	end,
 })
 
-minetest.register_chatcommand("give_event_prize", {
-	params = "<event> <name>",
-	description = "Give <event> prize to <name> if player has all event keys",
+local cmd_params_giveprize = "<event> <player>"
+minetest.register_chatcommand("eventkeys_giveprize", {
+	params = cmd_params_giveprize,
+	description = "Give <event> prize to <player> if player has all event keys",
 	privs = {give=true},
 	func = function(runner, parameters)
 		local found, _, event, target = parameters:find("^([^%s]+) ([^%s]+)$")
 		if found == nil then
 			minetest.chat_send_player(runner, "Invalid usage: "..parameters)
+			minetest.chat_send_player(runner, "    /eventkeys_giveprize "..cmd_params_giveprize)
 			return
 		end
 
@@ -553,6 +555,47 @@ minetest.register_chatcommand("give_event_prize", {
 			give_prize(get_event(runner, event), player, target)
 		else
 			minetest.chat_send_player(runner, "Invalid target: "..target)
+		end
+	end
+})
+
+local cmd_params_list = "[<event>]"
+minetest.register_chatcommand("eventkeys_list", {
+	params = cmd_params_list,
+	description = "List all events, or if optional <event> is given, list all keys for event.",
+	privs = {give=true},
+	func = function(runner, parameters)
+		if parameters == "" then
+			-- list events
+			local events = ""
+			for _,e in pairs(eventkeys.events) do
+				if events == "" then events = e.name else events = events..", "..e.name end
+				if e.enabled ~= true then events = events.." (disabled)" end
+			end
+			minetest.chat_send_player(runner, "Events: "..events)
+		else
+			local found, _, name = parameters:find("^([^%s]+)$")
+			if found == nil then
+				minetest.chat_send_player(runner, "Invalid usage: "..parameters)
+				minetest.chat_send_player(runner, "    /eventkeys_list "..cmd_params_list)
+				return
+			end
+
+			-- list keys
+			for _,e in pairs(eventkeys.events) do
+				if e.name == name then
+					if e.enabled ~= true then
+						minetest.chat_send_player(runner, "Event: "..name.." (disabled)")
+					else
+						minetest.chat_send_player(runner, "Event: "..name)
+					end
+					for _,k in pairs(e.keys) do
+						minetest.chat_send_player(runner, "    "..k[1].."  •  "..k[2])
+					end
+					return
+				end
+			end
+			minetest.chat_send_player(runner, "Invalid event: "..name)
 		end
 	end
 })
