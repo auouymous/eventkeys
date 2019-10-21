@@ -1,6 +1,10 @@
 -- player walks over key node to receive key and teleport to another location
--- a player detector and command block can be used to call "give_event_prize <event> @nearest" when player enters a room with all keys
+-- a player detector and command block can be used to call "eventkeys_giveprize <event> @nearest" when player enters a room with all keys
 -- or player can walk over a prize node with all keys
+
+-- for those without access to the config.lua file:
+	-- use /eventkeys_list to see all events
+	-- use /eventkeys_list <event> to see all keys for an event
 
 eventkeys.events = {
 	{
