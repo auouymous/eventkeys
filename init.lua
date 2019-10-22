@@ -327,6 +327,7 @@ minetest.register_entity("eventkeys:key_entity", {
 	textures = {"air"},
 	collisionbox = {0,0,0,0,0,0},
 	physical = false,
+	glow = 1, -- TODO: any non-zero value increases texture brightness slightly, but it needs to be even brighter for full brightness
 	_yaw = 0.0,
 	on_step = function(self, dtime)
 		self._yaw = self._yaw + 0.0125
