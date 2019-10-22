@@ -58,4 +58,20 @@ eventkeys.events = {
 		sound = "tnt_ignite",
 		message = "Enjoy your prize!",
 	},
+
+	-- sample key textures
+	{
+		enabled = true,
+		name = "event3",
+		keys = {
+			{"e3_disc", "Disc Key", "eventkeys_key_disc.png^[multiply:#ff0"},
+			{"e3_gem", "Gem Key", "eventkeys_key_gem.png^[multiply:#ff0"},
+			{"e3_key", "Key Key", "eventkeys_key_key.png^[multiply:#ff0"},
+			{"e3_orb", "Orb Key", "eventkeys_key_orb.png^[multiply:#ff0"},
+			{"e3_star", "Star Key", "eventkeys_key_star.png^[multiply:#ff0"},
+		},
+		prizes = {
+			{1, "default:stone"},
+		}
+	},
 }
