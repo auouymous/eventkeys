@@ -346,6 +346,8 @@ minetest.register_entity("eventkeys:key_entity", {
 	end
 })
 
+local node_activation_radius = tonumber(minetest.settings:get("eventkeys_node_activation_radius") or 0.75)
+
 minetest.register_node("eventkeys:key_node", {
 	description = "Event Key Giver",
 	tiles = {{name="eventkeys_U_anim.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=4}},
@@ -429,7 +431,7 @@ minetest.register_node("eventkeys:key_node", {
 		if meta == nil then return false end
 		local key = meta:get_string("key")
 		if key == "" then return false end
-		local objs = minetest.get_objects_inside_radius(pos, 0.5)
+		local objs = minetest.get_objects_inside_radius(pos, node_activation_radius)
 		if #objs == 0 then return true end
 
 		for n = 1, #objs do
@@ -523,7 +525,7 @@ minetest.register_node("eventkeys:prize_node", {
 	on_timer = function(pos)
 		local meta = minetest.get_meta(pos)
 		if meta == nil then return false end
-		local objs = minetest.get_objects_inside_radius(pos, 0.5)
+		local objs = minetest.get_objects_inside_radius(pos, node_activation_radius)
 		if #objs == 0 then return true end
 
 		for n = 1, #objs do
