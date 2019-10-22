@@ -328,12 +328,8 @@ minetest.register_entity("eventkeys:key_entity", {
 	collisionbox = {0,0,0,0,0,0},
 	physical = false,
 	glow = 1, -- TODO: any non-zero value increases texture brightness slightly, but it needs to be even brighter for full brightness
-	_yaw = 0.0,
-	on_step = function(self, dtime)
-		self._yaw = self._yaw + 0.0125
-		if self._yaw >= 2 then self._yaw = 0.0 end
-		self.object:setyaw(self._yaw*math.pi)
-	end,
+	automatic_rotate = 2*math.pi / 5,
+
 	on_blast = function(self, damage)
 		-- immortal doesn't stop TNT from destroying entity
 		return false, false, {} -- do_damage, do_knockback, entity_drops
