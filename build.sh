@@ -3,7 +3,7 @@
 function make_key(){
 	I=".key-$1.xpm"
 	O="textures/eventkeys_key_$1.png"
-	if [ "$I" -nt "$O" -o "$1" = "disc" ]; then
+	if [ "$I" -nt "$O" ]; then
 		echo "[build] $O"
 		convert $I $O
 	fi
