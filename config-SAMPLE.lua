@@ -21,9 +21,9 @@ eventkeys.events = {
 		-- only use letters, numbers and underscores in short name
 		-- add new images to the textures directory in this mod
 		keys = {
-			{"e1_red", "Red Key", "eventkeys_key.png^[colorize:#f00"},
-			{"e1_green", "Green Key", "eventkeys_key.png^[colorize:#0f0"},
-			{"e1_blue", "Blue Key", "eventkeys_key.png^[colorize:#00f"},
+			{"e1_red", "Red Key", "eventkeys_key_disc.png^[multiply:#f00"},
+			{"e1_green", "Green Key", "eventkeys_key_disc.png^[multiply:#0f0"},
+			{"e1_blue", "Blue Key", "eventkeys_key_disc.png^[multiply:#00f"},
 		},
 
 		-- <quantity> <item>
@@ -46,10 +46,10 @@ eventkeys.events = {
 		enabled = true,
 		name = "event2",
 		keys = {
-			{"e2_yellow", "Yellow Key", "eventkeys_key.png^[colorize:#ff0"},
-			{"e2_cyan", "Cyan Key", "eventkeys_key.png^[colorize:#0ff"},
-			{"e2_magenta", "Magenta Key", "eventkeys_key.png^[colorize:#f0f"},
-			{"e2_black", "Black Key", "eventkeys_key.png^[colorize:#000"},
+			{"e2_yellow", "Yellow Key", "eventkeys_key_disc.png^[multiply:#ff0"},
+			{"e2_cyan", "Cyan Key", "eventkeys_key_disc.png^[multiply:#0ff"},
+			{"e2_magenta", "Magenta Key", "eventkeys_key_disc.png^[multiply:#f0f"},
+			{"e2_black", "Black Key", "eventkeys_key_disc.png^[multiply:#222"},
 		},
 		prizes = {
 			{99, "default:stone"},
