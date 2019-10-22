@@ -1,7 +1,15 @@
 #!/bin/sh
 
-convert .key-disc.xpm textures/eventkeys_key_disc.png
-convert .key-gem.xpm textures/eventkeys_key_gem.png
-convert .key-key.xpm textures/eventkeys_key_key.png
-convert .key-orb.xpm textures/eventkeys_key_orb.png
-convert .key-star.xpm textures/eventkeys_key_star.png
+function make_key(){
+	I=".key-$1.xpm"
+	O="textures/eventkeys_key_$1.png"
+	if [ "$I" -nt "$O" -o "$1" = "disc" ]; then
+		echo "[build] $O"
+		convert $I $O
+	fi
+}
+make_key disc
+make_key gem
+make_key key
+make_key orb
+make_key star
