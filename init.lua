@@ -346,15 +346,15 @@ minetest.register_entity("eventkeys:key_entity", {
 
 minetest.register_node("eventkeys:key_node", {
 	description = "Event Key Giver",
-	tiles = {{name="eventkeys_U_anim.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=4}},
-		"eventkeys_S.png","eventkeys_S.png","eventkeys_S.png","eventkeys_S.png","eventkeys_S.png"},
+	tiles = {{name="eventkeys_node_U-key_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=4}},
+		"eventkeys_node_S.png","eventkeys_node_S.png","eventkeys_node_S.png","eventkeys_node_S.png","eventkeys_node_S.png"},
 	sounds = default.node_sound_stone_defaults(),
 	groups = {dig_immediate = 2},
 	is_ground_content = false,
 	paramtype = "light", -- entities inside the node are black without this
 	light_source = node_light_source,
 
-	wield_image = "eventkeys_U.png",
+	wield_image = "eventkeys_node_U-key.png",
 	drawtype = "nodebox",
 	walkable = true,
 	sunlight_propagates = true,
@@ -463,14 +463,15 @@ minetest.register_node("eventkeys:key_node", {
 
 minetest.register_node("eventkeys:prize_node", {
 	description = "Event Prize Giver",
-	tiles = {"eventkeys_S.png"},
+	tiles = {{name="eventkeys_node_U-prize_animated.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=5}},
+		"eventkeys_node_S.png","eventkeys_node_S.png","eventkeys_node_S.png","eventkeys_node_S.png","eventkeys_node_S.png"},
 	sounds = default.node_sound_stone_defaults(),
 	groups = {dig_immediate = 2},
 	is_ground_content = false,
 	paramtype = "light", -- entities inside the node are black without this
 	light_source = node_light_source,
 
-	wield_image = "eventkeys_S.png",
+	wield_image = "eventkeys_node_U-prize.png",
 	drawtype = "nodebox",
 	walkable = true,
 	sunlight_propagates = true,
