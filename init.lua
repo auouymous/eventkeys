@@ -142,6 +142,8 @@ local give_prize = function(event, player, player_name)
 	if event.sound then minetest.sound_play(event.sound, {pos = player:getpos(), gain = 1.0, max_hear_distance = 5}) end
 	-- send message when prize is given
 	if event.message then minetest.chat_send_player(player_name, event.message) end
+	-- send global message when prize is given
+	if event.global_message then minetest.chat_send_all(string.format(event.global_message, player_name)) end
 end
 
 local set_key_infotext = function(player_name, meta)

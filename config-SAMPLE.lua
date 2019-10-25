@@ -39,6 +39,10 @@ eventkeys.events = {
 
 		-- send message to player when prize given
 		message = "Enjoy your sword!",
+
+		-- send message to ALL players when prize given
+		-- %s is replaced with the name of player who received the prize
+		global_message = "** %s wins! **",
 	},
 
 	-- can have multiple active events
