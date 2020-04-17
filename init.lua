@@ -139,7 +139,7 @@ local give_prize = function(event, player, player_name)
 	end
 
 	-- play sound when prize is given
-	if event.sound then minetest.sound_play(event.sound, {pos = player:getpos(), gain = 1.0, max_hear_distance = 5}) end
+	if event.sound then minetest.sound_play(event.sound, {pos = player:get_pos(), gain = 1.0, max_hear_distance = 5}) end
 	-- send message when prize is given
 	if event.message then minetest.chat_send_player(player_name, event.message) end
 	-- send global message when prize is given
@@ -289,7 +289,7 @@ minetest.register_tool("eventkeys:coord_tool", {
 		local tool_meta = itemstack:get_meta()
 		if tool_meta == nil then return itemstack end
 
-		local pos = user:getpos()
+		local pos = user:get_pos()
 		tool_meta:set_float("x", pos.x)
 		tool_meta:set_float("y", pos.y)
 		tool_meta:set_float("z", pos.z)
@@ -454,9 +454,9 @@ minetest.register_node("eventkeys:key_node", {
 
 				-- teleport player to destination
 				local dst_pos = {x=meta:get_float("x"), y=meta:get_float("y"), z=meta:get_float("z")}
-				player:setpos({x=dst_pos.x, y=dst_pos.y+0.25, z=dst_pos.z})
-				player:set_look_pitch(0)
-				player:set_look_yaw(meta:get_int("yaw")*0.0174533)
+				player:set_pos({x=dst_pos.x, y=dst_pos.y+0.25, z=dst_pos.z})
+				player:set_look_vertical(0)
+				player:set_look_horizontal(meta:get_int("yaw")*0.0174533)
 
 				-- sound and particles at destination position
 				minetest.sound_play("portal_close", {pos = dst_pos, gain = 1.0, max_hear_distance = 5})
