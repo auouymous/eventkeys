@@ -435,14 +435,18 @@ minetest.register_node("eventkeys:key_node", {
 		for n = 1, #objs do
 			if objs[n]:is_player() then
 				local player = objs[n]
+				local key_item = "eventkeys:item_"..key.." 1"
+				local inv = player:get_inventory()
 
-				-- add key to player's inventory
-				local leftovers = player:get_inventory():add_item("main", "eventkeys:item_"..key.." 1")
-				if not leftovers:is_empty() then
-					minetest.chat_send_player(player:get_player_name(), "You need an empty inventory slot to receive the key")
-					return true
+				if not inv:contains_item("main", key_item) then
+					-- add key to player's inventory
+					local leftovers = inv:add_item("main", key_item)
+					if not leftovers:is_empty() then
+						minetest.chat_send_player(player:get_player_name(), "You need an empty inventory slot to receive the key")
+						return true
+					end
+					minetest.log("action", "give event key "..key.." to "..player:get_player_name())
 				end
-				minetest.log("action", "give event key "..key.." to "..player:get_player_name())
 
 				-- sound and particles at source position
 				minetest.sound_play("portal_close", {pos = pos, gain = 1.0, max_hear_distance = 5})
