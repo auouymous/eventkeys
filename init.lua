@@ -1,13 +1,13 @@
 eventkeys = {}
 local MP = minetest.get_modpath("eventkeys").."/"
 
-local particle_amount = tonumber(minetest.settings:get("eventkeys_particle_amount") or 25) -- number of particles per teleport
-local particle_time = tonumber(minetest.settings:get("eventkeys_particle_time") or 2) -- seconds each particle exists
-local max_coord = tonumber(minetest.settings:get("map_generation_limit") or 31000) -- max nodes in any direction from 0,0,0 for teleports
-local key_node_timer = tonumber(minetest.settings:get("eventkeys_key_node_timer") or 0.5) -- period in seconds for checking if player is on a key node
-local prize_node_timer = tonumber(minetest.settings:get("eventkeys_prize_node_timer") or 2.0) -- period in seconds for checking if player is on a prize node
-local node_activation_radius = tonumber(minetest.settings:get("eventkeys_node_activation_radius") or 0.75) -- distance player can be from center of node to activate it
-local node_light_source = tonumber(minetest.settings:get("eventkeys_node_light_source") or 14) -- amount of light emitted from key and prize nodes (0-14)
+local particle_amount = tonumber(minetest.settings:get("eventkeys_particle_amount")) or 25 -- number of particles per teleport
+local particle_time = tonumber(minetest.settings:get("eventkeys_particle_time")) or 2 -- seconds each particle exists
+local max_coord = tonumber(minetest.settings:get("map_generation_limit")) or 31000 -- max nodes in any direction from 0,0,0 for teleports
+local key_node_timer = tonumber(minetest.settings:get("eventkeys_key_node_timer")) or 0.5 -- period in seconds for checking if player is on a key node
+local prize_node_timer = tonumber(minetest.settings:get("eventkeys_prize_node_timer")) or 2.0 -- period in seconds for checking if player is on a prize node
+local node_activation_radius = tonumber(minetest.settings:get("eventkeys_node_activation_radius")) or 0.75 -- distance player can be from center of node to activate it
+local node_light_source = tonumber(minetest.settings:get("eventkeys_node_light_source")) or 14 -- amount of light emitted from key and prize nodes (0-14)
 
 
 
