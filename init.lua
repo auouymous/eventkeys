@@ -11,19 +11,52 @@ local node_light_source = tonumber(minetest.settings:get("eventkeys_node_light_s
 
 
 
+local give_key_to_player = function(key, player)
+	local key_item = "eventkeys:item_"..key.." 1"
+	local inv = player:get_inventory()
+
+	if not inv:contains_item("main", key_item) then
+		-- add key to player's inventory
+		local leftovers = inv:add_item("main", key_item)
+		if not leftovers:is_empty() then
+			minetest.chat_send_player(player:get_player_name(), "You need an empty inventory slot to receive the key")
+			return false
+		end
+		minetest.log("action", "give event key "..key.." to "..player:get_player_name())
+		return true
+	end
+	return false
+end
+
+local is_punchable = function(meta)
+	local punchable = meta:get_string("punchable")
+	if punchable ~= nil and punchable == "true" then return true else return false end
+end
+local is_punchable_str = function(meta)
+	local punchable = meta:get_string("punchable")
+	if punchable ~= nil and punchable == "true" then return "true" else return "false" end
+end
+
 local add_key_entity = function(pos)
 	local meta = minetest.get_meta(pos)
 	if not meta or meta:get_string("key") == "" then return end
 
-	minetest.add_entity(pos, "eventkeys:key_entity")
+	if is_punchable(meta) then
+		minetest.add_entity(pos, "eventkeys:key_entity_punchable")
+	else
+		minetest.add_entity(pos, "eventkeys:key_entity")
+	end
 end
 
 local remove_key_entity = function(pos)
 	local objects = minetest.get_objects_inside_radius(pos, 0.001)
 	if objects then
 		for _,o in ipairs(objects) do
-			if o and o:get_luaentity() and o:get_luaentity().name == "eventkeys:key_entity" then
-				o:remove()
+			if o then
+				local ent = o:get_luaentity()
+				if ent and (ent.name == "eventkeys:key_entity" or ent.name == "eventkeys:key_entity_punchable") then
+					o:remove()
+				end
 			end
 		end
 	end
@@ -208,6 +241,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if fields.coords ~= nil then
 		-- key node
 
+		meta:set_int("unavailable", 0)
+
+		if fields.punchable ~= nil then
+			meta:set_string("punchable", fields.punchable)
+		end
+
 		meta:set_string("key", fields.key)
 		remove_key_entity(pos)
 		if get_key(nil, fields.key) then
@@ -343,7 +382,43 @@ minetest.register_entity("eventkeys:key_entity", {
 			local key = meta:get_string("key")
 			self.object:set_properties({textures = {"eventkeys:item_"..key}})
 		end
-	end
+	end,
+})
+minetest.register_entity("eventkeys:key_entity_punchable", {
+	hp_max = 1,
+	visual = "wielditem",
+	visual_size = {x = 0.333, y = 0.333},
+	textures = {"air"},
+	collisionbox = {-0.25,-0.25,-0.25,0.25,0.25,0.25},
+	physical = false,
+	glow = 1, -- TODO: any non-zero value increases texture brightness slightly, but it needs to be even brighter for full brightness
+	automatic_rotate = 2*math.pi / 5,
+
+	on_blast = function(self, damage)
+		-- immortal doesn't stop TNT from destroying entity
+		return false, false, {} -- do_damage, do_knockback, entity_drops
+	end,
+	on_activate = function(self, staticdata)
+		self.object:set_armor_groups({immortal = 1})
+		local meta = minetest.get_meta(self.object:get_pos())
+		if meta ~= nil then
+			local key = meta:get_string("key")
+			self.object:set_properties({textures = {"eventkeys:item_"..key}})
+		end
+	end,
+	on_punch = function(self, hitter, tflp, tool_capabilities, dir)
+		local pos = self.object:get_pos()
+		local meta = minetest.get_meta(pos)
+		if meta ~= nil then
+			local key = meta:get_string("key")
+			if give_key_to_player(key, hitter) then
+				meta:set_int("unavailable", 1)
+				remove_key_entity(pos)
+				minetest.sound_play("default_item_smoke", {pos = pos, gain = 1.0, max_hear_distance = 5})
+				minetest.get_node_timer(pos):start(1.0)
+			end
+		end
+	end,
 })
 
 minetest.register_node("eventkeys:key_node", {
@@ -388,7 +463,7 @@ minetest.register_node("eventkeys:key_node", {
 		local meta = minetest.get_meta(pos)
 		if meta ~= nil then
 			minetest.show_formspec(clicker:get_player_name(), "eventkeys:form_"..minetest.pos_to_string(pos),
-				"size[8,5.5]"..default.gui_bg..default.gui_bg_img
+				"size[8,6.5]"..default.gui_bg..default.gui_bg_img
 
 				.."label[0.8,0.15;Key name]"
 				.."field[2.5,0.5;4.5,0.5;key;;"..meta:get_string("key").."]"
@@ -402,8 +477,10 @@ minetest.register_node("eventkeys:key_node", {
 				.."label[1.3,2.75;Enter player's yaw after teleport (0 to 359)]"
 				.."field[3.5,3.75;1.5,0.5;yaw;;"..meta:get_int("yaw").."]"
 
-				.."button_exit[0.95,5;3,0.5;save;Save]"
-				.."button_exit[4.05,5;3,0.5;cancel;Cancel]")
+				.."checkbox[2.5,4.25;punchable;Punch to take key;"..is_punchable_str(meta).."]"
+
+				.."button_exit[0.95,6;3,0.5;save;Save]"
+				.."button_exit[4.05,6;3,0.5;cancel;Cancel]")
 		end
 	end,
 
@@ -411,6 +488,8 @@ minetest.register_node("eventkeys:key_node", {
 	on_punch = function(pos, node, puncher)
 		local meta = minetest.get_meta(pos)
 		if meta == nil then return end
+
+		if meta:get_int("unavailable") == 1 then return end -- key was just taken, don't refresh it
 
 		local player_name = puncher:get_player_name()
 
@@ -421,12 +500,22 @@ minetest.register_node("eventkeys:key_node", {
 		if get_key(player_name, meta:get_string("key")) then
 			add_key_entity(pos)
 		end
-		minetest.get_node_timer(pos):start(key_node_timer)
+		if not is_punchable(meta) then
+			minetest.get_node_timer(pos):start(key_node_timer)
+		end
 	end,
 
 	on_timer = function(pos)
 		local meta = minetest.get_meta(pos)
 		if meta == nil then return false end
+		if is_punchable(meta) then
+			if meta:get_int("unavailable") == 1 then
+				add_key_entity(pos)
+				meta:set_int("unavailable", 0)
+			end
+			return false
+		end
+
 		local key = meta:get_string("key")
 		if key == "" then return false end
 		local objs = minetest.get_objects_inside_radius(pos, node_activation_radius)
@@ -435,32 +524,21 @@ minetest.register_node("eventkeys:key_node", {
 		for n = 1, #objs do
 			if objs[n]:is_player() then
 				local player = objs[n]
-				local key_item = "eventkeys:item_"..key.." 1"
-				local inv = player:get_inventory()
+				if give_key_to_player(key, player) then
+					-- sound and particles at source position
+					minetest.sound_play("portal_close", {pos = pos, gain = 1.0, max_hear_distance = 5})
+					spawn_teleport_particles(pos, 2.3 - 15/16, -1, 1.7)
 
-				if not inv:contains_item("main", key_item) then
-					-- add key to player's inventory
-					local leftovers = inv:add_item("main", key_item)
-					if not leftovers:is_empty() then
-						minetest.chat_send_player(player:get_player_name(), "You need an empty inventory slot to receive the key")
-						return true
-					end
-					minetest.log("action", "give event key "..key.." to "..player:get_player_name())
+					-- teleport player to destination
+					local dst_pos = {x=meta:get_float("x"), y=meta:get_float("y"), z=meta:get_float("z")}
+					player:set_pos({x=dst_pos.x, y=dst_pos.y+0.25, z=dst_pos.z})
+					player:set_look_vertical(0)
+					player:set_look_horizontal(meta:get_int("yaw")*0.0174533)
+
+					-- sound and particles at destination position
+					minetest.sound_play("portal_close", {pos = dst_pos, gain = 1.0, max_hear_distance = 5})
+					spawn_teleport_particles(dst_pos, 0.5, 1, 1.7)
 				end
-
-				-- sound and particles at source position
-				minetest.sound_play("portal_close", {pos = pos, gain = 1.0, max_hear_distance = 5})
-				spawn_teleport_particles(pos, 2.3 - 15/16, -1, 1.7)
-
-				-- teleport player to destination
-				local dst_pos = {x=meta:get_float("x"), y=meta:get_float("y"), z=meta:get_float("z")}
-				player:set_pos({x=dst_pos.x, y=dst_pos.y+0.25, z=dst_pos.z})
-				player:set_look_vertical(0)
-				player:set_look_horizontal(meta:get_int("yaw")*0.0174533)
-
-				-- sound and particles at destination position
-				minetest.sound_play("portal_close", {pos = dst_pos, gain = 1.0, max_hear_distance = 5})
-				spawn_teleport_particles(dst_pos, 0.5, 1, 1.7)
 			end
 		end
 		return true
