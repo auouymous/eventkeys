@@ -307,8 +307,6 @@ for _,e in pairs(eventkeys.events) do
 			minetest.register_tool("eventkeys:item_"..name, {
 				description = desc,
 				inventory_image = image,
-				on_use = function(itemstack, user, pointed_thing) return itemstack end,
-				on_place = function(itemstack, user, pointed_thing) return itemstack end,
 			})
 		end
 
